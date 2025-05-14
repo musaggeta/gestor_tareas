@@ -3,7 +3,14 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+
+// Configuración de CORS
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://tudominio.vercel.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // si usas cookies o autenticación basada en sesiones (no necesario con JWT)
+}));
+//middleware
 app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
@@ -21,5 +28,7 @@ app.listen(PORT, () => {
 const { sequelize } = require("./models");
 
 sequelize.authenticate()
-  .then(() => console.log("✅ Conexión con la base de datos establecida"))
-  .catch((err) => console.error("❌ Error al conectar con la base de datos:", err));
+  .then(() => console.log("Conexión con la base de datos establecida"))
+  .catch((err) => console.error("Error al conectar con la base de datos:", err));
+
+  

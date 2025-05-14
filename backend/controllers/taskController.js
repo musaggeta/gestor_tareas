@@ -1,4 +1,5 @@
 const { Task } = require('../models');
+const { Op } = require('sequelize');
 
 // Crear tarea
 exports.createTask = async (req, res) => {
@@ -68,9 +69,36 @@ exports.editTask = async (req, res) => {
 };
 
 exports.getAllTasks = async (req, res) => {
+  const { status, q } = req.query;
+  const where = { userId: req.userId };
+
+  // Filtro por status
+  if (status) {
+    const estadosValidos = ["pendiente", "en progreso", "completada"];
+    const statusNormalizado = status.trim().toLowerCase().replace(/-/g, " ");
+    const statusEncontrado = estadosValidos.find(
+      estado => estado === statusNormalizado
+    );
+
+    if (!statusEncontrado) {
+      return res.status(400).json({ message: "Estado inválido" });
+    }
+
+    where.status = statusEncontrado;
+  }
+
+    // Filtro por palabra clave en título o descripción
+if (q) {
+  where[Op.or] = [
+    { title: { [Op.iLike]: `%${q}%` } },
+    { description: { [Op.iLike]: `%${q}%` } }
+  ];
+}
+
+
   try {
     const tasks = await Task.findAll({
-      where: { userId: req.userId },
+      where,
       order: [["createdAt", "DESC"]],
     });
 
@@ -79,6 +107,7 @@ exports.getAllTasks = async (req, res) => {
     res.status(500).json({ message: "Error al obtener las tareas", error: error.message });
   }
 };
+
 
 exports.deleteTask = async (req, res) => {
   const { id } = req.params;
@@ -106,3 +135,4 @@ exports.deleteTask = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar la tarea", error: error.message });
   }
 };
+
