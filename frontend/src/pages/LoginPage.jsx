@@ -17,8 +17,8 @@ const LoginPage = () => {
       await login(token);
       navigate("/dashboard");
     } catch (err) {
-  setError(err.response?.data?.message || "Error del servidor.");
-}
+      setError(err.response?.data?.message || "Error del servidor.");
+    }
 
   };
 

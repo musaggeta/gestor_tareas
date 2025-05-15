@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+
 
 const AuthContext = createContext();
 
@@ -17,12 +19,25 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  useEffect(() => {
-    if (token) {
-      // Aquí podrías llamar a /api/auth/me para obtener datos del usuario si quieres
-      setUser({ email: "usuario@ejemplo.com" }); // Placeholder
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get("http://localhost:4000/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(res.data);
+    } catch {
+      console.warn("Token inválido o expirado");
+      logout();
     }
-  }, [token]);
+  };
+
+  if (token) {
+    fetchUser();
+  }
+}, [token]);
+
+
 
   return (
     <AuthContext.Provider value={{ token, login, logout, user }}>

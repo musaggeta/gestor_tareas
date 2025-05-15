@@ -15,8 +15,8 @@ const RegisterPage = () => {
       await registerUser(name, email, password);
       navigate("/login");
     } catch (err) {
-  setError(err.response?.data?.message || "Error del servidor.");
-}
+      setError(err.response?.data?.message || "Error del servidor.");
+    }
   };
 
   return (
