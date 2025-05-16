@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { getUserTasks, createTask, updateTask } from "../services/taskService";
+import { getUserTasks, createTask, updateTask, deleteTask } from "../services/taskService";
 import TaskCard from "../components/TaskCard";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import TaskForm from "../components/TaskForm";
+
 
 
 const DashboardPage = () => {
@@ -58,6 +59,14 @@ const DashboardPage = () => {
         }
     };
 
+    const handleDeleteTask = async (taskId) => {
+        try {
+            await deleteTask(token, taskId);
+            setTasks((prev) => prev.filter((t) => t.id !== taskId));
+        } catch (err) {
+            console.error("Error al eliminar la tarea:", err);
+        }
+    };
 
     return (
         <div>
@@ -91,10 +100,12 @@ const DashboardPage = () => {
                 <p>No tienes tareas aún.</p>
             ) : (
                 tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} />
+                    <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} onDelete={handleDeleteTask} />
+
                 ))
 
             )}
+
         </div>
     );
 };

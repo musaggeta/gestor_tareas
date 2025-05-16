@@ -30,3 +30,12 @@ export const updateTask = async (token, taskId, updates) => {
   });
   return response.data.task;
 };
+
+export const deleteTask = async (token, taskId) => {
+  await axios.delete(`http://localhost:4000/api/tasks/${taskId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
