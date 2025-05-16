@@ -10,6 +10,9 @@ const DashboardPage = () => {
     const [tasks, setTasks] = useState([]);
     const { token, logout, user } = useAuth();
     const navigate = useNavigate();
+    const [filter, setFilter] = useState("todas");
+    const [search, setSearch] = useState("");
+
 
     useEffect(() => {
         fetchTasks();
@@ -17,13 +20,18 @@ const DashboardPage = () => {
 
     const fetchTasks = async () => {
         try {
-            const data = await getUserTasks(token);
+            const query = {};
+            if (filter !== "todas") query.status = filter;
+            if (search.trim()) query.q = search;
+
+            const data = await getUserTasks(token, query);
             setTasks(data);
         } catch {
             logout();
             navigate("/login");
         }
     };
+
 
     const handleCreateTask = async (newTask) => {
         try {
@@ -57,6 +65,26 @@ const DashboardPage = () => {
             <button onClick={handleLogout}>Cerrar sesión</button>
 
             <TaskForm onTaskCreated={handleCreateTask} />
+            <div>
+                <label>Filtrar por estado: </label>
+                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                    <option value="todas">Todas</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en progreso">En progreso</option>
+                    <option value="completada">Completada</option>
+                </select>
+
+                <input
+                    type="text"
+                    placeholder="Buscar por título o descripción"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    style={{ marginLeft: "1rem" }}
+                />
+
+                <button onClick={fetchTasks} style={{ marginLeft: "1rem" }}>Aplicar filtros</button>
+            </div>
+
 
             <h3>Tus tareas:</h3>
             {tasks.length === 0 ? (
