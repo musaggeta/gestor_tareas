@@ -2,6 +2,7 @@ import { useState } from "react";
 import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import "./LoginPage.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -22,9 +23,9 @@ const LoginPage = () => {
 
   };
 
-  return (
+return (
     <div className="login-page">
-      <h2>Iniciar Sesión</h2>
+      <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -40,9 +41,14 @@ const LoginPage = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p>{error}</p>}
         <button type="submit">Entrar</button>
       </form>
+
+      <div className="register-redirect">
+        <p>¿No tienes cuenta?</p>
+        <button onClick={() => navigate("/register")}>Registrarse</button>
+      </div>
     </div>
   );
 };

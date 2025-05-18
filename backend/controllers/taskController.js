@@ -1,6 +1,8 @@
 const { Task } = require('../models');
 const { Op } = require('sequelize');
 
+
+
 // Crear tarea
 exports.createTask = async (req, res) => {
   try {
@@ -67,12 +69,15 @@ exports.editTask = async (req, res) => {
     res.status(500).json({ message: "Error al editar la tarea", error: error.message });
   }
 };
+const { Op } = require("sequelize");
 
 exports.getAllTasks = async (req, res) => {
-  const { status, q } = req.query;
+  const { status, q, createdFrom, createdTo, dueFrom, dueTo } = req.query;
+
+  // Base: solo tareas del usuario autenticado
   const where = { userId: req.userId };
 
-  // Filtro por status
+  // Filtro por estado (status)
   if (status) {
     const estadosValidos = ["pendiente", "en progreso", "completada"];
     const statusNormalizado = status.trim().toLowerCase().replace(/-/g, " ");
@@ -87,24 +92,42 @@ exports.getAllTasks = async (req, res) => {
     where.status = statusEncontrado;
   }
 
-    // Filtro por palabra clave en título o descripción
-if (q) {
-  where[Op.or] = [
-    { title: { [Op.iLike]: `%${q}%` } },
-    { description: { [Op.iLike]: `%${q}%` } }
-  ];
-}
+  // Filtro por palabra clave (título o descripción)
+  if (q) {
+    where[Op.or] = [
+      { title: { [Op.iLike]: `%${q}%` } },
+      { description: { [Op.iLike]: `%${q}%` } },
+    ];
+  }
 
+  // Filtros de rango de fechas separados
+  const whereExtra = {};
 
+  if (createdFrom || createdTo) {
+    whereExtra.createdAt = {};
+    if (createdFrom) whereExtra.createdAt[Op.gte] = new Date(createdFrom);
+    if (createdTo)   whereExtra.createdAt[Op.lte] = new Date(createdTo);
+  }
+
+  if (dueFrom || dueTo) {
+    whereExtra.dueDate = {};
+    if (dueFrom) whereExtra.dueDate[Op.gte] = new Date(dueFrom);
+    if (dueTo)   whereExtra.dueDate[Op.lte] = new Date(dueTo);
+  }
+
+  // Combinamos todos los filtros
   try {
     const tasks = await Task.findAll({
-      where,
+      where: { ...where, ...whereExtra },
       order: [["createdAt", "DESC"]],
     });
 
     res.json(tasks);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener las tareas", error: error.message });
+    res.status(500).json({
+      message: "Error al obtener las tareas",
+      error: error.message,
+    });
   }
 };
 

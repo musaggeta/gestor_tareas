@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const TaskCard = ({ task, onUpdate,onDelete }) => {
+const TaskCard = ({ task, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     title: task.title,
@@ -41,6 +41,22 @@ const TaskCard = ({ task, onUpdate,onDelete }) => {
       <p>{task.description}</p>
       <p><strong>Estado:</strong> {task.status}</p>
       {task.dueDate && <p><strong>Fecha límite:</strong> {new Date(task.dueDate).toLocaleDateString()}</p>}
+      
+      {(task.status === "pendiente" || task.status === "en progreso") && (
+        <button
+          onClick={() => {
+            const siguienteEstado =
+              task.status === "pendiente" ? "en progreso" : "completada";
+
+            if (confirm(`¿Pasar esta tarea a "${siguienteEstado}"?`)) {
+              onUpdate(task.id, { status: siguienteEstado });
+            }
+          }}
+          style={{ marginTop: "0.5rem", backgroundColor: "#1976d2", color: "white" }}
+        >
+          Marcar como "{task.status === "pendiente" ? "en progreso" : "completada"}"
+        </button>
+      )}
       <button onClick={() => setIsEditing(true)}>Editar</button>
 
       {task.status === "completada" && (

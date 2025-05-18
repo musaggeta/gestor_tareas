@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { registerUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import "./RegisterPage.css";
+
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -46,6 +48,11 @@ const RegisterPage = () => {
         />
         {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit">Registrarse</button>
+        <p>¿Ya tienes una cuenta?</p>
+        <button type="button" onClick={() => navigate("/login")}>
+          Iniciar sesión
+        </button>
+
       </form>
     </div>
   );

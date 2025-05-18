@@ -4,7 +4,7 @@ import TaskCard from "../components/TaskCard";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import TaskForm from "../components/TaskForm";
-
+import "./DashboardPage.css";
 
 
 const DashboardPage = () => {
@@ -13,6 +13,9 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const [filter, setFilter] = useState("todas");
     const [search, setSearch] = useState("");
+    const [dueFrom, setDueFrom] = useState("");
+    const [dueTo, setDueTo] = useState("");
+
 
 
     useEffect(() => {
@@ -24,6 +27,8 @@ const DashboardPage = () => {
             const query = {};
             if (filter !== "todas") query.status = filter;
             if (search.trim()) query.q = search;
+            if (dueFrom) query.dueFrom = dueFrom;
+            if (dueTo) query.dueTo = dueTo;
 
             const data = await getUserTasks(token, query);
             setTasks(data);
@@ -69,45 +74,55 @@ const DashboardPage = () => {
     };
 
     return (
-        <div>
-            <h2>Bienvenido, {user?.name || "Usuario"} </h2>
-            <button onClick={handleLogout}>Cerrar sesión</button>
+        <div className="dashboard-wrapper">
+            <div className="dashboard-content">
+                <h2>Bienvenido, {user?.name || "Usuario"} </h2>
+                <button onClick={handleLogout}>Cerrar sesión</button>
 
-            <TaskForm onTaskCreated={handleCreateTask} />
-            <div>
-                <label>Filtrar por estado: </label>
-                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                    <option value="todas">Todas</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="en progreso">En progreso</option>
-                    <option value="completada">Completada</option>
-                </select>
+                <TaskForm onTaskCreated={handleCreateTask} />
 
-                <input
-                    type="text"
-                    placeholder="Buscar por título o descripción"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    style={{ marginLeft: "1rem" }}
-                />
+                <div className="filters">
+                    <label>Filtrar por estado: </label>
+                    <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                        <option value="todas">Todas</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en progreso">En progreso</option>
+                        <option value="completada">Completada</option>
+                    </select>
 
-                <button onClick={fetchTasks} style={{ marginLeft: "1rem" }}>Aplicar filtros</button>
+                    <input
+                        type="text"
+                        placeholder="Buscar por título o descripción"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+
+                    <div className="date-filters">
+                        <label>Desde: </label>
+                        <input type="date" value={dueFrom} onChange={(e) => setDueFrom(e.target.value)} />
+                        <label>Hasta: </label>
+                        <input type="date" value={dueTo} onChange={(e) => setDueTo(e.target.value)} />
+                    </div>
+
+                    <button onClick={fetchTasks}>Aplicar filtros</button>
+                </div>
+
+                <h3>Tus tareas:</h3>
+                {tasks.length === 0 ? (
+                    <p>No tienes tareas aún.</p>
+                ) : (
+                    <div className="task-grid">
+                        {tasks.map((task) => (
+                            <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} onDelete={handleDeleteTask} />
+                        ))}
+                    </div>
+                )}
             </div>
-
-
-            <h3>Tus tareas:</h3>
-            {tasks.length === 0 ? (
-                <p>No tienes tareas aún.</p>
-            ) : (
-                tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} onDelete={handleDeleteTask} />
-
-                ))
-
-            )}
-
         </div>
     );
+
+
+
 };
 
 
