@@ -1,8 +1,10 @@
 
 .dashboard-wrapper {
+      width: 100vw;  
+      
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   min-height: 100vh;
   padding: 2rem;
   
@@ -11,7 +13,7 @@
 .dashboard-content {
   width: 100%;
   max-width: 960px;
-  
+  background: gray;
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);

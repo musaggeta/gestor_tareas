@@ -6,7 +6,7 @@ const app = express();
 
 // Configuración de CORS
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://tudominio.vercel.app'],
+  origin: ['http://localhost:5173', 'https://gestor-tareas.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true // si usas cookies o autenticación basada en sesiones (no necesario con JWT)
 }));
